@@ -15,9 +15,9 @@ func SetupRoutes(r *gin.Engine) {
 	authPosts := r.Group("/api/auth/posts")
 	authPosts.Use(auth.JwtMiddleware())
 	authPosts.POST("/", post.CreatePostHandler)
-	authPosts.PUT("/*title", post.UpdatePostHandler)
-	authPosts.DELETE("/*title", post.DeletePostHandler)
+	authPosts.PUT("/:id", post.UpdatePostHandler)
+	authPosts.DELETE("/:id", post.DeletePostHandler)
 
 	r.GET("/api/posts", post.ListPostsHandler)
-	r.GET("/api/posts/*title", post.GetPostHandler)
+	r.GET("/api/posts/:id", post.GetPostHandler)
 }
