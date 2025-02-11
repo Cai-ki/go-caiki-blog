@@ -10,6 +10,7 @@ import (
 
 func JwtMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 注意写前端时，请求头Authorization的格式为Bearer tokenString
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			utils.RespondWithJSON(c, http.StatusUnauthorized, "Unauthorized")
