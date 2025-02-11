@@ -22,7 +22,7 @@ var _ UserService = (*userServiceImpl)(nil)
 
 var userService = userServiceImpl{}
 
-func (us userServiceImpl) Register(username, email, password string) (user models.Users, err error) {
+func (userServiceImpl) Register(username, email, password string) (user models.Users, err error) {
 	data := []byte(password)
 	hash := sha256.Sum256(data)
 
@@ -43,12 +43,12 @@ func (us userServiceImpl) Register(username, email, password string) (user model
 	return user, nil
 }
 
-func (us userServiceImpl) Login(email, password string) (string, error) { return "", nil }
+func (userServiceImpl) Login(email, password string) (string, error) { return "", nil }
 
-func (us userServiceImpl) GetUserByEmail(email string) (models.Users, error) {
+func (userServiceImpl) GetUserByEmail(email string) (models.Users, error) {
 	return models.Users{}, nil
 }
 
-func (us userServiceImpl) GetUserByName(username string) (models.Users, error) {
+func (userServiceImpl) GetUserByName(username string) (models.Users, error) {
 	return models.Users{}, nil
 }
