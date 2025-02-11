@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/pkg/storage"
 	"github.com/Cai-ki/go-caiki-blog/routes"
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	models.SetupModels(db)
 	storage.SetupStorage(db)
 
 	r := gin.Default()
