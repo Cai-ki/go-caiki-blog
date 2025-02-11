@@ -3,6 +3,8 @@ package auth
 import (
 	"time"
 
+	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/storage"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -11,11 +13,13 @@ var JwtSecretKey = []byte("secret-key")
 type Claims struct {
 	jwt.RegisteredClaims
 	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
 type AuthJwt interface {
-	GenerateToken(username string) (string, error)
+	GenerateToken(username string, email string) (string, error)
 	ParseToken(tokenString string) (*Claims, error)
+	ValidateClaimsExists(claims *Claims) (bool, error)
 }
 
 type authJwtImpl struct {
@@ -25,7 +29,7 @@ var _ AuthJwt = (*authJwtImpl)(nil)
 
 var Jwt AuthJwt = authJwtImpl{}
 
-func (authJwtImpl) GenerateToken(username string) (string, error) {
+func (authJwtImpl) GenerateToken(username string, email string) (string, error) {
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -33,6 +37,7 @@ func (authJwtImpl) GenerateToken(username string) (string, error) {
 			Issuer:    "go-caiki-blog",
 		},
 		Username: username,
+		Email:    email,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -53,4 +58,18 @@ func (authJwtImpl) ParseToken(tokenString string) (*Claims, error) {
 	}
 
 	return nil, jwt.ErrSignatureInvalid
+}
+
+func (authJwtImpl) ValidateClaimsExists(claims *Claims) (bool, error) {
+	db := storage.DB.GetDB()
+	var user models.Users
+	if err := db.Where("username = ? AND email = ?", claims.Username, claims.Email).First(&user).Error; err != nil {
+		return false, err
+	}
+
+	if user.ID == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }

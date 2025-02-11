@@ -32,7 +32,20 @@ func JwtMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		ok, err := Jwt.ValidateClaimsExists(claims)
+
+		if err != nil {
+			utils.RespondWithJSON(c, http.StatusInternalServerError, "Internal Server Error")
+		}
+
+		if !ok {
+			utils.RespondWithJSON(c, http.StatusUnauthorized, "Unauthorized")
+			c.Abort()
+			return
+		}
+
 		c.Set("username", claims.Username)
+		c.Set("email", claims.Email)
 		c.Next()
 	}
 }
