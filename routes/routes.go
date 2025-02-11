@@ -7,6 +7,6 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 	r.POST("/api/users", users.RegisterHandler)
-	r.POST("/api/login", users.LoginHandler)
+	r.POST("/api/auth/login", users.LoginHandler)
 	r.GET("/api/users/:username", users.GetUserHandler)
 }
