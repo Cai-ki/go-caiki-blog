@@ -29,7 +29,7 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := userService.Register(req.Username, req.Email, req.Password)
+	user, err := Service.Register(req.Username, req.Email, req.Password)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to register user")
 		return
@@ -56,7 +56,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := userService.Login(req.Email, req.Password)
+	token, err := Service.Login(req.Email, req.Password)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusUnauthorized, "Invalid email or password")
 		return
@@ -68,7 +68,7 @@ func LoginHandler(c *gin.Context) {
 
 type getUserResponseInfo struct {
 	Username string `json:"username"`
-	Email    string `json:"email"`
+	// Email    string `json:"email"`
 	// CreatedAt time.Time `json:"created_at"`
 	// AvatarURL string `json:"avatar_url"`
 }
@@ -76,12 +76,12 @@ type getUserResponseInfo struct {
 func GetUserHandler(c *gin.Context) {
 	username := c.Param("username")
 
-	user, err := userService.GetUserByName(username)
+	user, err := Service.GetUserByName(username)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "User not found")
 		return
 	}
 
-	userInfo := getUserResponseInfo{Username: user.Username, Email: user.Email}
+	userInfo := getUserResponseInfo{Username: user.Username}
 	utils.RespondWithJSON(c, http.StatusOK, userInfo)
 }
