@@ -25,13 +25,13 @@ func RegisterHandler(c *gin.Context) {
 	var req registerRequestInfo
 
 	if err := c.BindJSON(&req); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, err)
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	user, err := userService.Register(req.Username, req.Email, req.Password)
 	if err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, err)
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to register user")
 		return
 	}
 
@@ -52,13 +52,13 @@ func LoginHandler(c *gin.Context) {
 	var req loginRequestInfo
 
 	if err := c.BindJSON(&req); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, err)
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	token, err := userService.Login(req.Email, req.Password)
 	if err != nil {
-		utils.RespondWithError(c, http.StatusUnauthorized, err)
+		utils.RespondWithError(c, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
@@ -78,7 +78,7 @@ func GetUserHandler(c *gin.Context) {
 
 	user, err := userService.GetUserByName(username)
 	if err != nil {
-		utils.RespondWithError(c, http.StatusNotFound, err)
+		utils.RespondWithError(c, http.StatusNotFound, "User not found")
 		return
 	}
 
