@@ -4,10 +4,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type Post struct {
+type Posts struct {
 	gorm.Model
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	AuthorID int    `json:"author_id"`
-	Tags     []Tag  `json:"tags"`
+	Tags     []Tags `json:"tags"`
 }

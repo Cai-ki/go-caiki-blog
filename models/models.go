@@ -3,8 +3,8 @@ package models
 import "gorm.io/gorm"
 
 func SetupModels(db *gorm.DB) {
-	db.AutoMigrate(&User{})
-	// db.AutoMigrate(&Post{})
-	// db.AutoMigrate(&Tag{})
-	// db.AutoMigrate(&Post{})
+	db.AutoMigrate(&Users{})
+	// db.AutoMigrate(&Posts{})
+	// db.AutoMigrate(&Tags{})
+	// db.AutoMigrate(&Posts{})
 }

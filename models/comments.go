@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Comment struct {
+type Comments struct {
 	gorm.Model
 	PostID  int    `json:"post_id"`
 	UserID  int    `json:"user_id"`
