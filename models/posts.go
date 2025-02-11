@@ -6,8 +6,8 @@ import (
 
 type Posts struct {
 	gorm.Model
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	AuthorID int    `json:"author_id"`
-	Tags     []Tags `json:"tags"`
+	Title   string `gorm:"not null"`
+	Content string `gorm:"not null"`
+	UserID  uint   `gorm:"not null"`
+	User    Users  `gorm:"foreignKey:UserID"`
 }

@@ -4,5 +4,5 @@ import "gorm.io/gorm"
 
 type Tags struct {
 	gorm.Model
-	Name string `json:"name"`
+	Name string
 }
