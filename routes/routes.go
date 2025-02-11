@@ -9,8 +9,8 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 	r.POST("/api/users", users.RegisterHandler)
-	r.GET("/api/users/:username", users.GetUserHandler)
 	r.POST("/api/auth/login", users.LoginHandler)
+	r.GET("/api/users/:username", users.GetUserHandler)
 
 	authPosts := r.Group("/api/auth/posts")
 	authPosts.Use(auth.JwtMiddleware())
