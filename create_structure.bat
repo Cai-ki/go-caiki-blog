@@ -32,12 +32,12 @@ type nul > pkg\config\config.go
 type nul > pkg\logger\logger.go
 type nul > pkg\storage\storage.go
 type nul > pkg\validator\validator.go
-type nul > models\user.go
-type nul > models\post.go
-type nul > models\comment.go
-type nul > models\tag.go
+type nul > models\users.go
+type nul > models\posts.go
+type nul > models\comments.go
+type nul > models\tags.go
 type nul > routes\routes.go
-type nul > utils\errors.go
+type nul > utils\utils.go
 
 echo Finish
 pause
