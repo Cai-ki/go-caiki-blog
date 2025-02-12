@@ -55,7 +55,7 @@ func (userServiceImpl) Login(email, password string) (string, error) {
 		return "", err
 	}
 
-	jwtToken, err := auth.Jwt.GenerateToken(user.Username, user.Email)
+	jwtToken, err := auth.Jwt.GenerateToken(user.ID, user.Username, user.Email)
 	if err != nil {
 		return "", err
 	}
