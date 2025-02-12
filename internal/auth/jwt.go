@@ -12,12 +12,13 @@ var JwtSecretKey = []byte("secret-key")
 
 type Claims struct {
 	jwt.RegisteredClaims
+	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
 type AuthJwt interface {
-	GenerateToken(username string, email string) (string, error)
+	GenerateToken(id uint, username string, email string) (string, error)
 	ParseToken(tokenString string) (*Claims, error)
 	ValidateClaimsExists(claims *Claims) (bool, error)
 }
@@ -29,13 +30,14 @@ var _ AuthJwt = (*authJwtImpl)(nil)
 
 var Jwt AuthJwt = authJwtImpl{}
 
-func (authJwtImpl) GenerateToken(username string, email string) (string, error) {
+func (authJwtImpl) GenerateToken(id uint, username string, email string) (string, error) {
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "go-caiki-blog",
 		},
+		ID:       id,
 		Username: username,
 		Email:    email,
 	}
@@ -63,7 +65,7 @@ func (authJwtImpl) ParseToken(tokenString string) (*Claims, error) {
 func (authJwtImpl) ValidateClaimsExists(claims *Claims) (bool, error) {
 	db := storage.DB.GetDB()
 	var user models.Users
-	if err := db.Where("username = ? AND email = ?", claims.Username, claims.Email).First(&user).Error; err != nil {
+	if err := db.Where("id = ?", claims.ID).First(&user).Error; err != nil {
 		return false, err
 	}
 
