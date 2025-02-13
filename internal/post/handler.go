@@ -2,6 +2,7 @@ package post
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
@@ -64,6 +65,17 @@ type postInfo struct {
 	CreatedAt string `json:"created_at"`
 }
 
+type postDetailInfo struct {
+	ID      uint   `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Author  struct {
+		ID   uint   `json:"id"`
+		Name string `json:"name"`
+	} `json:"author"`
+	CreatedAt string `json:"created_at"`
+}
+
 func ListPostsHandler(c *gin.Context) {
 	var req listPostsRequestInfo
 	if err := c.BindQuery(&req); err != nil {
@@ -96,8 +108,107 @@ func ListPostsHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, res)
 }
 
-func GetPostHandler(c *gin.Context) {}
+func GetPostHandler(c *gin.Context) {
+	postIDStr := c.Param("id")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid post ID")
+		return
+	}
+	post, err := Service.GetPost(uint(postID))
 
-func UpdatePostHandler(c *gin.Context) {}
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
 
-func DeletePostHandler(c *gin.Context) {}
+	res := postDetailInfo{
+		ID:      post.ID,
+		Title:   post.Title,
+		Content: post.Content,
+		Author: struct {
+			ID   uint   `json:"id"`
+			Name string `json:"name"`
+		}{post.UserID, post.User.Username},
+		CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, res)
+}
+
+func UpdatePostHandler(c *gin.Context) {
+	postIDStr := c.Param("id")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid post ID")
+		return
+	}
+	post, err := Service.GetPost(uint(postID))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
+	if post.UserID != c.GetUint("user_id") {
+		utils.RespondWithError(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+
+	var req createPostRequestInfo
+	if err := c.BindJSON(&req); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	err = Service.UpdatePost(post.ID, req.Title, req.Content)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update post")
+		return
+	}
+
+	post, err = Service.GetPost(uint(postID))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
+	res := postDetailInfo{
+		ID:      post.ID,
+		Title:   post.Title,
+		Content: post.Content,
+		Author: struct {
+			ID   uint   `json:"id"`
+			Name string `json:"name"`
+		}{post.UserID, post.User.Username},
+		CreatedAt: post.CreatedAt.Format("2006-01-02 15:04:05"),
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, res)
+}
+
+func DeletePostHandler(c *gin.Context) {
+	postIDStr := c.Param("id")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid post ID")
+		return
+	}
+	post, err := Service.GetPost(uint(postID))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
+	if post.UserID != c.GetUint("user_id") {
+		utils.RespondWithError(c, http.StatusForbidden, "Forbidden")
+		return
+	}
+	err = Service.DeletePost(uint(postID))
+
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
+	utils.RespondWithJSON(c, http.StatusNoContent, nil)
+}
