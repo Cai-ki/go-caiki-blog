@@ -6,7 +6,9 @@ import (
 
 type Comments struct {
 	gorm.Model
-	PostID  int
-	UserID  int
 	Content string
+	PostID  uint
+	UserID  uint
+	User    Users `gorm:"foreignKey:UserID"`
+	Post    Posts `gorm:"foreignKey:PostID"`
 }
