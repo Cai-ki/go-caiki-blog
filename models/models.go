@@ -6,5 +6,5 @@ func SetupModels(db *gorm.DB) {
 	db.AutoMigrate(&Users{})
 	db.AutoMigrate(&Posts{})
 	db.AutoMigrate(&Comments{})
-	// db.AutoMigrate(&Tags{})
+	db.AutoMigrate(&Tags{})
 }

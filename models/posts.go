@@ -10,4 +10,5 @@ type Posts struct {
 	Content string `gorm:"type:text;not null"`
 	UserID  uint   `gorm:"not null"`
 	User    Users  `gorm:"foreignKey:UserID"`
+	Tags    []Tags `gorm:"many2many:posts_tags;"`
 }
