@@ -4,14 +4,15 @@ import (
 	"github.com/Cai-ki/go-caiki-blog/internal/auth"
 	"github.com/Cai-ki/go-caiki-blog/internal/comment"
 	"github.com/Cai-ki/go-caiki-blog/internal/post"
-	users "github.com/Cai-ki/go-caiki-blog/internal/user"
+	"github.com/Cai-ki/go-caiki-blog/internal/tag"
+	"github.com/Cai-ki/go-caiki-blog/internal/user"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes(r *gin.Engine) {
-	r.POST("/api/users", users.RegisterHandler)
-	r.POST("/api/auth/login", users.LoginHandler)
-	r.GET("/api/users/:username", users.GetUserHandler)
+	r.POST("/api/users", user.RegisterHandler)
+	r.POST("/api/auth/login", user.LoginHandler)
+	r.GET("/api/users/:username", user.GetUserHandler)
 
 	r.GET("/api/posts", post.ListPostsHandler)
 	r.GET("/api/posts/:id", post.GetPostHandler)
@@ -27,4 +28,7 @@ func SetupRoutes(r *gin.Engine) {
 	authComments.Use(auth.JwtMiddleware())
 	authComments.POST("/:id", comment.CreateCommentHandler)
 
+	r.GET("/api/tags", tag.ListTagsHandler)
+
+	r.GET("/test/tags/:name", tag.CreateTagHandler)
 }
