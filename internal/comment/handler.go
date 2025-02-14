@@ -28,6 +28,12 @@ func ListCommentsHandler(c *gin.Context) {
 
 	post := models.Posts{}
 	post.ID = uint(postID)
+
+	if err = postService.GetPost(&post); err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
 	comments := []models.Comments{}
 
 	if err = Service.ListComments(&post, &comments); err != nil {
