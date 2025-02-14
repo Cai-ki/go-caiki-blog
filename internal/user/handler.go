@@ -1,87 +1,88 @@
 package user
 
 import (
+	"crypto/sha256"
 	"net/http"
 	"time"
 
+	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
 
-type registerRequestInfo struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type registerResponseInfo struct {
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	// AvatarURL string `json:"avatar_url"`
-}
-
 func RegisterHandler(c *gin.Context) {
-	var req registerRequestInfo
+	var req struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
 	if err := c.BindJSON(&req); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
-	user, err := Service.Register(req.Username, req.Email, req.Password)
-	if err != nil {
+	data := []byte(req.Password)
+	hash := sha256.Sum256(data)
+	user := models.Users{Username: req.Username, Email: req.Email, Password: string(hash[:])}
+
+	if err := Service.Register(&user); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to register user")
 		return
 	}
 
-	userInfo := registerResponseInfo{Username: user.Username, Email: user.Email, CreatedAt: user.CreatedAt}
+	userInfo := struct {
+		Username  string    `json:"username"`
+		Email     string    `json:"email"`
+		CreatedAt time.Time `json:"created_at"`
+		// AvatarURL string `json:"avatar_url"`
+	}{Username: user.Username, Email: user.Email, CreatedAt: user.CreatedAt}
 	utils.RespondWithJSON(c, http.StatusCreated, userInfo)
 }
 
-type loginRequestInfo struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type loginResponseInfo struct {
-	Token string `json:"token"`
-}
-
 func LoginHandler(c *gin.Context) {
-	var req loginRequestInfo
+	var req struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
 	if err := c.BindJSON(&req); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
-	token, err := Service.Login(req.Email, req.Password)
+	data := []byte(req.Password)
+	hash := sha256.Sum256(data)
+	user := models.Users{Email: req.Email, Password: string(hash[:])}
+
+	token, err := Service.Login(&user)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
-	userInfo := loginResponseInfo{Token: token}
-	utils.RespondWithJSON(c, http.StatusOK, userInfo)
-}
+	userInfo := struct {
+		Token string `json:"token"`
+	}{Token: token}
 
-type getUserResponseInfo struct {
-	Username string `json:"username"`
-	// Email    string `json:"email"`
-	// CreatedAt time.Time `json:"created_at"`
-	// AvatarURL string `json:"avatar_url"`
+	utils.RespondWithJSON(c, http.StatusOK, userInfo)
 }
 
 func GetUserHandler(c *gin.Context) {
 	username := c.Param("username")
+	user := models.Users{Username: username}
 
-	user, err := Service.GetUserByName(username)
-	if err != nil {
+	if err := Service.GetUser(&user); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "User not found")
 		return
 	}
 
-	userInfo := getUserResponseInfo{Username: user.Username}
+	userInfo := struct {
+		Username string `json:"username"`
+		// Email    string `json:"email"`
+		// CreatedAt time.Time `json:"created_at"`
+		// AvatarURL string `json:"avatar_url"`
+	}{Username: user.Username}
+
 	utils.RespondWithJSON(c, http.StatusOK, userInfo)
 }
