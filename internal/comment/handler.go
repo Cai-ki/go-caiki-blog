@@ -4,14 +4,13 @@ import (
 	"net/http"
 	"strconv"
 
+	postservice "github.com/Cai-ki/go-caiki-blog/internal/post"
 	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
 
-type listCommentResponseInfo struct {
-	Comments []commentInfo `json:"comments"`
-}
+var postService = postservice.Service
 
 type commentInfo struct {
 	Username  string `json:"username"`
@@ -27,38 +26,33 @@ func ListCommentsHandler(c *gin.Context) {
 		return
 	}
 
-	comments, err := Service.ListComments(postID)
-	if err != nil {
+	post := models.Posts{}
+	post.ID = uint(postID)
+	comments := []models.Comments{}
+
+	if err = Service.ListComments(&post, &comments); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list comments")
 		return
 	}
 
-	response := listCommentResponseInfo{
-		Comments: make([]commentInfo, len(comments)),
-	}
+	response := make([]commentInfo, len(comments))
 
-	for i, comment := range comments {
-		response.Comments[i] = commentInfo{
+	for _, comment := range comments {
+		response = append(response, commentInfo{
 			Username:  comment.User.Username,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt.Format("2006-01-02 15:04:05"),
-		}
+		})
 	}
 
 	utils.RespondWithJSON(c, http.StatusOK, response)
 }
 
-type createCommentRequestInfo struct {
-	Content string `json:"content"`
-}
-
-type createCommentResponseInfo struct {
-	CreatedAt string `json:"created_at"`
-}
-
 func CreateCommentHandler(c *gin.Context) {
-	var request createCommentRequestInfo
-	if err := c.ShouldBindJSON(&request); err != nil {
+	var request struct {
+		Content string `json:"content"`
+	}
+	if err := c.BindJSON(&request); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
@@ -71,6 +65,13 @@ func CreateCommentHandler(c *gin.Context) {
 	}
 
 	userID := c.GetUint("user_id")
+	post := models.Posts{}
+	post.ID = uint(postID)
+
+	if err = postService.GetPost(&post); err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
 
 	comment := models.Comments{
 		PostID:  uint(postID),
@@ -78,13 +79,14 @@ func CreateCommentHandler(c *gin.Context) {
 		Content: request.Content,
 	}
 
-	comment, err = Service.CreateComment(comment)
-	if err != nil {
+	if err = Service.CreateComment(&comment); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create comment")
 		return
 	}
 
-	response := createCommentResponseInfo{
+	response := struct {
+		CreatedAt string `json:"created_at"`
+	}{
 		CreatedAt: comment.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 
