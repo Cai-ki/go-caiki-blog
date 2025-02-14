@@ -58,7 +58,7 @@ func CreateCommentHandler(c *gin.Context) {
 	var request struct {
 		Content string `json:"content"`
 	}
-	if err := c.BindJSON(&request); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
