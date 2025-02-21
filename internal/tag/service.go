@@ -9,8 +9,8 @@ import (
 )
 
 type TagService interface {
-	ListTags(tags *[]models.Tags) error
-	ConnectTags(post *models.Posts, tags *[]models.Tags) error
+	ListTags(tags *[]models.Tags) (err error)
+	ConnectTags(post *models.Posts, tags *[]models.Tags) (err error)
 }
 
 type tagServiceImpl struct {
@@ -20,52 +20,52 @@ var _ TagService = (*tagServiceImpl)(nil)
 
 var Service = tagServiceImpl{}
 
-func (tagServiceImpl) ListTags(tags *[]models.Tags) error {
+func (tagServiceImpl) ListTags(tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
 
-	if err := db.Find(tags).Error; err != nil {
-		return err
+	if err = db.Find(tags).Error; err != nil {
+		return
 	}
-	return nil
+	return
 }
 
-func (tagServiceImpl) ConnectTags(post *models.Posts, tags *[]models.Tags) error {
+func (tagServiceImpl) ConnectTags(post *models.Posts, tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
 
-	if err := Service.CreateTags(tags); err != nil {
-		return err
+	if err = Service.CreateTags(tags); err != nil {
+		return
 	}
 
-	if err := db.Model(post).Association("Tags").Replace(tags); err != nil {
-		return err
+	if err = db.Model(post).Association("Tags").Replace(tags); err != nil {
+		return
 	}
-	return nil
+	return
 }
 
-func (tagServiceImpl) CreateTags(tags *[]models.Tags) error {
+func (tagServiceImpl) CreateTags(tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
 
 	for i := range *tags {
 		tag := &(*tags)[i]
 		var existingTag models.Tags
-		if err := db.Where("name = ?", tag.Name).First(&existingTag).Error; err == nil {
+		if err = db.Where("name = ?", tag.Name).First(&existingTag).Error; err == nil {
 			tag.ID = existingTag.ID
 		} else if errors.Is(err, gorm.ErrRecordNotFound) {
-			if err := db.Create(tag).Error; err != nil {
-				return err
+			if err = db.Create(tag).Error; err != nil {
+				return
 			}
 		} else {
-			return err
+			return
 		}
 	}
-	return nil
+	return
 }
 
-func (tagServiceImpl) ListPostTags(post *models.Posts, tags *[]models.Tags) error {
+func (tagServiceImpl) ListPostTags(post *models.Posts, tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
 
-	if err := db.Model(post).Association("Tags").Find(tags); err != nil {
-		return err
+	if err = db.Model(post).Association("Tags").Find(tags); err != nil {
+		return
 	}
-	return nil
+	return
 }
