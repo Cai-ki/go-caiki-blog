@@ -4,7 +4,6 @@ import (
 	"github.com/Cai-ki/go-caiki-blog/internal/handler"
 	"github.com/Cai-ki/go-caiki-blog/internal/middleware"
 	"github.com/Cai-ki/go-caiki-blog/internal/post"
-	"github.com/Cai-ki/go-caiki-blog/internal/tag"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,8 +26,8 @@ func SetupRoutes(r *gin.Engine) {
 	authComments.Use(middleware.JwtMiddleware())
 	authComments.POST("/:id", handler.CreateCommentHandler)
 
-	r.GET("/api/tags", tag.ListTagsHandler)
+	r.GET("/api/tags", handler.ListTagsHandler)
 
-	r.GET("/test/tags/:id", tag.ListPostTagsHandler)
-	r.POST("/test/tags/connect", tag.ConnectTagsHandler)
+	r.GET("/test/tags/:id", handler.ListPostTagsHandler)
+	r.POST("/test/tags/connect", handler.ConnectTagsHandler)
 }

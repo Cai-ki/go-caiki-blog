@@ -1,4 +1,4 @@
-package tag
+package service
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type TagService interface {
+type tagService interface {
 	ListTags(tags *[]models.Tags) (err error)
 	ConnectTags(post *models.Posts, tags *[]models.Tags) (err error)
 }
@@ -16,9 +16,9 @@ type TagService interface {
 type tagServiceImpl struct {
 }
 
-var _ TagService = (*tagServiceImpl)(nil)
+var _ tagService = (*tagServiceImpl)(nil)
 
-var Service = tagServiceImpl{}
+var TagService = tagServiceImpl{}
 
 func (tagServiceImpl) ListTags(tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
@@ -32,7 +32,7 @@ func (tagServiceImpl) ListTags(tags *[]models.Tags) (err error) {
 func (tagServiceImpl) ConnectTags(post *models.Posts, tags *[]models.Tags) (err error) {
 	db := storage.DB.GetDB()
 
-	if err = Service.CreateTags(tags); err != nil {
+	if err = TagService.CreateTags(tags); err != nil {
 		return
 	}
 

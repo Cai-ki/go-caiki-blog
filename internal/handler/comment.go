@@ -4,15 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	postservice "github.com/Cai-ki/go-caiki-blog/internal/post"
-	"github.com/Cai-ki/go-caiki-blog/internal/service"
 	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
-
-var postService = postservice.Service
-var CommentService = service.CommentService
 
 type commentInfo struct {
 	Username  string `json:"username"`

@@ -1,16 +1,13 @@
-package tag
+package handler
 
 import (
 	"net/http"
 	"strconv"
 
-	"github.com/Cai-ki/go-caiki-blog/internal/post"
 	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
-
-var postService = post.Service
 
 type tagInfo struct {
 	ID   uint   `json:"id"`
@@ -19,7 +16,7 @@ type tagInfo struct {
 
 func ListTagsHandler(c *gin.Context) {
 	tags := []models.Tags{}
-	err := Service.ListTags(&tags)
+	err := TagService.ListTags(&tags)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list tags")
 		return
@@ -61,7 +58,7 @@ func ConnectTagsHandler(c *gin.Context) {
 		})
 	}
 
-	err = Service.ConnectTags(&post, &tags)
+	err = TagService.ConnectTags(&post, &tags)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to connect tags")
 		return
@@ -80,7 +77,7 @@ func ListPostTagsHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(id)
 	tags := []models.Tags{}
-	err = Service.ListPostTags(&post, &tags)
+	err = TagService.ListPostTags(&post, &tags)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list post tags")
 		return
