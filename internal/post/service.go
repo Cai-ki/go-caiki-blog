@@ -6,11 +6,11 @@ import (
 )
 
 type PostService interface {
-	CreatePost(user_id uint, title string, content string) (res models.Posts, err error)
-	ListPosts(page int, limit int) (res []models.Posts, err error)
-	GetPost(id uint) (res models.Posts, err error)
-	DeletePost(id uint) (err error)
-	UpdatePost(id uint, title string, content string) (err error)
+	CreatePost(post *models.Posts) (err error)
+	ListPosts(posts *[]models.Posts, page int, limit int) (err error)
+	GetPost(post *models.Posts) (err error)
+	DeletePost(post *models.Posts) (err error)
+	UpdatePost(post *models.Posts) (err error)
 }
 
 type postServiceImpl struct {
@@ -20,24 +20,16 @@ var _ PostService = (*postServiceImpl)(nil)
 
 var Service = postServiceImpl{}
 
-func (postServiceImpl) CreatePost(user_id uint, title string, content string) (res models.Posts, err error) {
-	post := models.Posts{UserID: user_id, Title: title, Content: content}
-
+func (postServiceImpl) CreatePost(post *models.Posts) (err error) {
 	db := storage.DB.GetDB()
 	if err = db.Create(&post).Error; err != nil {
-		return models.Posts{}, err
+		return
 	}
 
-	db.Model(&models.Posts{}).Where("user_id = ?", user_id).First(&res)
-
-	if res.ID == 0 {
-		return models.Posts{}, err
-	}
-
-	return res, nil
+	return
 }
 
-func (postServiceImpl) ListPosts(page int, limit int) (res []models.Posts, err error) {
+func (postServiceImpl) ListPosts(posts *[]models.Posts, page int, limit int) (err error) {
 	if page <= 0 {
 		page = 1
 	}
@@ -47,41 +39,36 @@ func (postServiceImpl) ListPosts(page int, limit int) (res []models.Posts, err e
 
 	db := storage.DB.GetDB()
 	db = db.Preload("User").Model(&models.Posts{})
-	if err = db.Offset((page - 1) * limit).Limit(limit).Find(&res).Error; err != nil {
-		return []models.Posts{}, err
+	if err = db.Offset((page - 1) * limit).Limit(limit).Find(posts).Error; err != nil {
+		return
 	}
 
-	return res, nil
+	return
 }
 
-func (postServiceImpl) GetPost(id uint) (res models.Posts, err error) {
+func (postServiceImpl) GetPost(post *models.Posts) (err error) {
 	db := storage.DB.GetDB()
 	db = db.Preload("User").Model(&models.Posts{})
-	if err = db.Where("id = ?", id).First(&res).Error; err != nil {
-		return models.Posts{}, err
-	}
 
-	return res, nil
+	if err = db.First(&post).Error; err != nil {
+		return
+	}
+	return
 }
 
-func (postServiceImpl) DeletePost(id uint) (err error) {
+func (postServiceImpl) DeletePost(post *models.Posts) (err error) {
 	db := storage.DB.GetDB()
-	if err = db.Where("id = ?", id).Delete(&models.Posts{}).Error; err != nil {
-		return err
-	}
 
-	return nil
+	if err = db.Delete(&post).Error; err != nil {
+		return
+	}
+	return
 }
 
-func (postServiceImpl) UpdatePost(id uint, title string, content string) (err error) {
+func (postServiceImpl) UpdatePost(post *models.Posts) (err error) {
 	db := storage.DB.GetDB()
-	if err = db.Model(&models.Posts{}).Where("id = ?", id).Update("title", title).Error; err != nil {
-		return err
+	if err = db.Model(post).Updates(&post).Error; err != nil {
+		return
 	}
-
-	if err = db.Model(&models.Posts{}).Where("id = ?", id).Update("content", content).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return
 }
