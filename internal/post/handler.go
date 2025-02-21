@@ -170,7 +170,7 @@ func UpdatePostHandler(c *gin.Context) {
 		return
 	}
 
-	if Service.GetPost(&post); err != nil {
+	if err := Service.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}

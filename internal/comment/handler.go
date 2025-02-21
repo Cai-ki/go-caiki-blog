@@ -41,7 +41,7 @@ func ListCommentsHandler(c *gin.Context) {
 		return
 	}
 
-	response := make([]commentInfo, len(comments))
+	response := []commentInfo{}
 
 	for _, comment := range comments {
 		response = append(response, commentInfo{
