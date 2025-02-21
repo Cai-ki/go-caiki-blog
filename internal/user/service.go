@@ -1,10 +1,12 @@
 package user
 
 import (
-	"github.com/Cai-ki/go-caiki-blog/internal/auth"
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/jwt"
 	"github.com/Cai-ki/go-caiki-blog/pkg/storage"
 )
+
+var Jwt = jwt.Jwt
 
 type UserService interface {
 	Register(user *models.Users) (err error)
@@ -33,7 +35,7 @@ func (userServiceImpl) Login(user *models.Users) (token string, err error) {
 		return
 	}
 
-	jwtToken, err := auth.Jwt.GenerateToken(user.ID, user.Username, user.Email)
+	jwtToken, err := Jwt.GenerateToken(user.ID, user.Username, user.Email)
 	if err != nil {
 		return
 	}

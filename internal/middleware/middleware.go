@@ -1,12 +1,15 @@
-package auth
+package middleware
 
 import (
 	"net/http"
 	"strings"
 
+	"github.com/Cai-ki/go-caiki-blog/pkg/jwt"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
+
+var Jwt = jwt.Jwt
 
 func JwtMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
