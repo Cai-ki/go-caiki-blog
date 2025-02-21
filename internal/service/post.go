@@ -1,11 +1,11 @@
-package post
+package service
 
 import (
 	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/pkg/storage"
 )
 
-type PostService interface {
+type postService interface {
 	CreatePost(post *models.Posts) (err error)
 	ListPosts(posts *[]models.Posts, page int, limit int) (err error)
 	GetPost(post *models.Posts) (err error)
@@ -16,9 +16,9 @@ type PostService interface {
 type postServiceImpl struct {
 }
 
-var _ PostService = (*postServiceImpl)(nil)
+var _ postService = (*postServiceImpl)(nil)
 
-var Service = postServiceImpl{}
+var PostService = postServiceImpl{}
 
 func (postServiceImpl) CreatePost(post *models.Posts) (err error) {
 	db := storage.DB.GetDB()

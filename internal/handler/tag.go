@@ -45,7 +45,7 @@ func ConnectTagsHandler(c *gin.Context) {
 
 	post := models.Posts{}
 	post.ID = req.PostID
-	err := postService.GetPost(&post)
+	err := PostService.GetPost(&post)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return

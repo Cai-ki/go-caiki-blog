@@ -1,4 +1,4 @@
-package post
+package handler
 
 import (
 	"net/http"
@@ -29,7 +29,7 @@ func CreatePostHandler(c *gin.Context) {
 		// Tags:    req.Tags,
 	}
 
-	if err := Service.CreatePost(&post); err != nil {
+	if err := PostService.CreatePost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create post")
 		return
 	}
@@ -76,7 +76,7 @@ func ListPostsHandler(c *gin.Context) {
 	}
 
 	posts := []models.Posts{}
-	if err := Service.ListPosts(&posts, req.Page, req.Limit); err != nil {
+	if err := PostService.ListPosts(&posts, req.Page, req.Limit); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list posts")
 		return
 	}
@@ -109,7 +109,7 @@ func GetPostHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(postID)
 
-	if err := Service.GetPost(&post); err != nil {
+	if err := PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
@@ -140,7 +140,7 @@ func UpdatePostHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(postID)
 
-	if err := Service.GetPost(&post); err != nil {
+	if err := PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
@@ -165,12 +165,12 @@ func UpdatePostHandler(c *gin.Context) {
 	post.Content = req.Content
 	// post.Tags = req.Tags
 
-	if err := Service.UpdatePost(&post); err != nil {
+	if err := PostService.UpdatePost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update post")
 		return
 	}
 
-	if err := Service.GetPost(&post); err != nil {
+	if err := PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
@@ -202,7 +202,7 @@ func DeletePostHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(postID)
 
-	if err := Service.GetPost(&post); err != nil {
+	if err := PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
@@ -212,7 +212,7 @@ func DeletePostHandler(c *gin.Context) {
 		return
 	}
 
-	if err := Service.DeletePost(&post); err != nil {
+	if err := PostService.DeletePost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}

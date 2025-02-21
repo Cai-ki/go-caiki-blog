@@ -26,7 +26,7 @@ func ListCommentsHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(postID)
 
-	if err = postService.GetPost(&post); err != nil {
+	if err = PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
@@ -71,7 +71,7 @@ func CreateCommentHandler(c *gin.Context) {
 	post := models.Posts{}
 	post.ID = uint(postID)
 
-	if err = postService.GetPost(&post); err != nil {
+	if err = PostService.GetPost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
 		return
 	}
