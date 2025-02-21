@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"github.com/Cai-ki/go-caiki-blog/internal/comment"
 	"github.com/Cai-ki/go-caiki-blog/internal/handler"
 	"github.com/Cai-ki/go-caiki-blog/internal/middleware"
 	"github.com/Cai-ki/go-caiki-blog/internal/post"
@@ -23,10 +22,10 @@ func SetupRoutes(r *gin.Engine) {
 	authPosts.PUT("/:id", post.UpdatePostHandler)
 	authPosts.DELETE("/:id", post.DeletePostHandler)
 
-	r.GET("/api/comments/:id", comment.ListCommentsHandler)
+	r.GET("/api/comments/:id", handler.ListCommentsHandler)
 	authComments := r.Group("/api/auth/comments")
 	authComments.Use(middleware.JwtMiddleware())
-	authComments.POST("/:id", comment.CreateCommentHandler)
+	authComments.POST("/:id", handler.CreateCommentHandler)
 
 	r.GET("/api/tags", tag.ListTagsHandler)
 
