@@ -30,6 +30,6 @@ func SetupRoutes(r *gin.Engine) {
 
 	r.GET("/api/tags", tag.ListTagsHandler)
 
-	r.GET("/test/tags/:name", tag.CreateTagHandler)
+	r.GET("/test/tags/:id", tag.ListPostTagsHandler)
 	r.POST("/test/tags/connect", tag.ConnectTagsHandler)
 }
