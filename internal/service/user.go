@@ -1,4 +1,4 @@
-package user
+package service
 
 import (
 	"github.com/Cai-ki/go-caiki-blog/models"
@@ -8,7 +8,7 @@ import (
 
 var Jwt = jwt.Jwt
 
-type UserService interface {
+type userService interface {
 	Register(user *models.Users) (err error)
 	Login(user *models.Users) (token string, err error)
 	GetUser(user *models.Users) (err error)
@@ -17,9 +17,9 @@ type UserService interface {
 type userServiceImpl struct {
 }
 
-var _ UserService = (*userServiceImpl)(nil)
+var _ userService = (*userServiceImpl)(nil)
 
-var Service = userServiceImpl{}
+var UserService = userServiceImpl{}
 
 func (userServiceImpl) Register(user *models.Users) (err error) {
 	db := storage.DB.GetDB()
