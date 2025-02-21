@@ -2,11 +2,15 @@ package tag
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/Cai-ki/go-caiki-blog/internal/post"
 	"github.com/Cai-ki/go-caiki-blog/models"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
 )
+
+var postService = post.Service
 
 type tagInfo struct {
 	ID   uint   `json:"id"`
@@ -18,6 +22,7 @@ func ListTagsHandler(c *gin.Context) {
 	err := Service.ListTags(&tags)
 	if err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list tags")
+		return
 	}
 
 	tagInfos := []tagInfo{}
@@ -31,19 +36,63 @@ func ListTagsHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, tagInfos)
 }
 
-func CreateTagHandler(c *gin.Context) {
-	name := c.Param("name")
-	tag := models.Tags{
-		Name: name,
+func ConnectTagsHandler(c *gin.Context) {
+	var req struct {
+		PostID uint     `json:"post_id"`
+		Tags   []string `json:"tags"`
 	}
-	err := Service.CreateTag(&tag)
-	if err != nil {
-		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create tag")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
-	utils.RespondWithJSON(c, http.StatusCreated, tagInfo{
-		ID:   tag.ID,
-		Name: tag.Name,
-	})
+	post := models.Posts{}
+	post.ID = req.PostID
+	err := postService.GetPost(&post)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusNotFound, "Post not found")
+		return
+	}
+
+	tags := []models.Tags{}
+	for _, name := range req.Tags {
+		tags = append(tags, models.Tags{
+			Name: name,
+		})
+	}
+
+	err = Service.ConnectTags(&post, &tags)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to connect tags")
+		return
+	}
+
+	utils.RespondWithError(c, http.StatusCreated, "Tags connected successfully")
+}
+
+func ListPostTagsHandler(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid post ID")
+		return
+	}
+	post := models.Posts{}
+	post.ID = uint(id)
+	tags := []models.Tags{}
+	err = Service.ListPostTags(&post, &tags)
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to list post tags")
+		return
+	}
+
+	tagInfos := []tagInfo{}
+	for _, tag := range tags {
+		tagInfos = append(tagInfos, tagInfo{
+			ID:   tag.ID,
+			Name: tag.Name,
+		})
+	}
+
+	utils.RespondWithJSON(c, http.StatusOK, tagInfos)
 }
