@@ -4,11 +4,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var Validate *validator.Validate
+var V *validator.Validate
 
 func SetupValidate(v *validator.Validate) {
-	Validate = v
-	Validate.RegisterValidation("test", testValidation)
+	V = v
+	V.RegisterValidation("test", testValidation)
 }
 
 func testValidation(fl validator.FieldLevel) bool {

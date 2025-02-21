@@ -5,23 +5,32 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Cai-ki/go-caiki-blog/internal/service"
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/validate"
 	"github.com/Cai-ki/go-caiki-blog/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
-
-var UserService = service.UserService
 
 func RegisterHandler(c *gin.Context) {
 	var req struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Username string `json:"username" validate:"required,min=3"`
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,min=6"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	err := validate.V.Struct(req)
+	if err != nil {
+		msg := ";"
+		for _, err := range err.(validator.ValidationErrors) {
+			msg += err.Field() + " : " + err.Tag() + " " + err.Param() + ";"
+		}
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body"+msg)
 		return
 	}
 
