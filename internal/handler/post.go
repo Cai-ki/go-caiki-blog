@@ -11,9 +11,9 @@ import (
 
 func CreatePostHandler(c *gin.Context) {
 	var req struct {
-		Title   string `json:"title"`
-		Content string `json:"content"`
-		// Tags    []string `json:"tags"`
+		Title   string   `json:"title"`
+		Content string   `json:"content"`
+		Tags    []string `json:"tags"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -26,11 +26,22 @@ func CreatePostHandler(c *gin.Context) {
 		Title:   req.Title,
 		Content: req.Content,
 		UserID:  userID,
-		// Tags:    req.Tags,
 	}
 
 	if err := PostService.CreatePost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create post")
+		return
+	}
+
+	tags := []models.Tags{}
+	for _, name := range req.Tags {
+		tags = append(tags, models.Tags{
+			Name: name,
+		})
+	}
+
+	if err := TagService.ConnectTags(&post, &tags); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to connect tags")
 		return
 	}
 
@@ -151,9 +162,9 @@ func UpdatePostHandler(c *gin.Context) {
 	}
 
 	var req struct {
-		Title   string `json:"title"`
-		Content string `json:"content"`
-		// Tags    []string `json:"tags"`
+		Title   string   `json:"title"`
+		Content string   `json:"content"`
+		Tags    []string `json:"tags"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -163,10 +174,21 @@ func UpdatePostHandler(c *gin.Context) {
 
 	post.Title = req.Title
 	post.Content = req.Content
-	// post.Tags = req.Tags
 
 	if err := PostService.UpdatePost(&post); err != nil {
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update post")
+		return
+	}
+
+	tags := []models.Tags{}
+	for _, name := range req.Tags {
+		tags = append(tags, models.Tags{
+			Name: name,
+		})
+	}
+
+	if err := TagService.ConnectTags(&post, &tags); err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to connect tags")
 		return
 	}
 
