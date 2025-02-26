@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 	"github.com/Cai-ki/go-caiki-blog/utils"
-	"github.com/gin-gonic/gin"
 )
 
 type commentInfo struct {
@@ -15,7 +15,7 @@ type commentInfo struct {
 	CreatedAt string `json:"created_at"`
 }
 
-func ListCommentsHandler(c *gin.Context) {
+func ListCommentsHandler(c *cgin.Context) {
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
@@ -51,7 +51,7 @@ func ListCommentsHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, response)
 }
 
-func CreateCommentHandler(c *gin.Context) {
+func CreateCommentHandler(c *cgin.Context) {
 	var request struct {
 		Content string `json:"content"`
 	}

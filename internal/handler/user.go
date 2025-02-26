@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 	"github.com/Cai-ki/go-caiki-blog/pkg/validate"
 	"github.com/Cai-ki/go-caiki-blog/utils"
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
-func RegisterHandler(c *gin.Context) {
+func RegisterHandler(c *cgin.Context) {
 	var req struct {
 		Username string `json:"username" validate:"required,min=3"`
 		Email    string `json:"email" validate:"required,email"`
@@ -52,7 +52,7 @@ func RegisterHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusCreated, userInfo)
 }
 
-func LoginHandler(c *gin.Context) {
+func LoginHandler(c *cgin.Context) {
 	var req struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -80,7 +80,7 @@ func LoginHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, userInfo)
 }
 
-func GetUserHandler(c *gin.Context) {
+func GetUserHandler(c *cgin.Context) {
 	username := c.Param("username")
 	user := models.Users{Username: username}
 

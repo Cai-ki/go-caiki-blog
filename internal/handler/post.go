@@ -5,11 +5,11 @@ import (
 	"strconv"
 
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 	"github.com/Cai-ki/go-caiki-blog/utils"
-	"github.com/gin-gonic/gin"
 )
 
-func CreatePostHandler(c *gin.Context) {
+func CreatePostHandler(c *cgin.Context) {
 	var req struct {
 		Title   string   `json:"title"`
 		Content string   `json:"content"`
@@ -75,16 +75,37 @@ type postDetailInfo struct {
 	Content string `json:"content"`
 }
 
-func ListPostsHandler(c *gin.Context) {
+func ListPostsHandler(c *cgin.Context) {
 	var req struct {
 		Page  int `form:"page"`
 		Limit int `form:"limit"`
 	}
 
-	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request query")
-		return
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+
+	var err error
+
+	if pageStr != "" {
+		req.Page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			utils.RespondWithError(c, http.StatusBadRequest, "Invalid page")
+			return
+		}
 	}
+
+	if limitStr != "" {
+		req.Limit, err = strconv.Atoi(limitStr)
+		if err != nil {
+			utils.RespondWithError(c, http.StatusBadRequest, "Invalid limit")
+			return
+		}
+	}
+
+	// if err := c.ShouldBindQuery(&req); err != nil {
+	// 	utils.RespondWithError(c, http.StatusBadRequest, "Invalid request query")
+	// 	return
+	// }
 
 	posts := []models.Posts{}
 	if err := PostService.ListPosts(&posts, req.Page, req.Limit); err != nil {
@@ -109,7 +130,7 @@ func ListPostsHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, res)
 }
 
-func GetPostHandler(c *gin.Context) {
+func GetPostHandler(c *cgin.Context) {
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
@@ -141,7 +162,7 @@ func GetPostHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, res)
 }
 
-func UpdatePostHandler(c *gin.Context) {
+func UpdatePostHandler(c *cgin.Context) {
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
@@ -213,7 +234,7 @@ func UpdatePostHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, res)
 }
 
-func DeletePostHandler(c *gin.Context) {
+func DeletePostHandler(c *cgin.Context) {
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {

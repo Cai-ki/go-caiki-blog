@@ -1,11 +1,11 @@
 package utils
 
-import "github.com/gin-gonic/gin"
+import "github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 
-func RespondWithError(c *gin.Context, code int, message string) {
+func RespondWithError(c *cgin.Context, code int, message string) {
 	c.JSON(code, Error{Code: code, Message: message})
 }
 
-func RespondWithJSON(c *gin.Context, code int, data interface{}) {
+func RespondWithJSON(c *cgin.Context, code int, data interface{}) {
 	c.JSON(code, data)
 }

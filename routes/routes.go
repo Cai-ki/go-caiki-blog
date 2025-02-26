@@ -3,10 +3,10 @@ package routes
 import (
 	"github.com/Cai-ki/go-caiki-blog/internal/handler"
 	"github.com/Cai-ki/go-caiki-blog/internal/middleware"
-	"github.com/gin-gonic/gin"
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 )
 
-func SetupRoutes(r *gin.Engine) {
+func SetupRoutes(r *cgin.Engine) {
 	r.POST("/api/users", handler.RegisterHandler)
 	r.POST("/api/auth/login", handler.LoginHandler)
 	r.GET("/api/users/:username", handler.GetUserHandler)

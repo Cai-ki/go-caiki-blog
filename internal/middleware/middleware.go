@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 	"github.com/Cai-ki/go-caiki-blog/pkg/jwt"
 	"github.com/Cai-ki/go-caiki-blog/utils"
-	"github.com/gin-gonic/gin"
 )
 
 var Jwt = jwt.Jwt
 
-func JwtMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
+func JwtMiddleware() cgin.HandlerFunc {
+	return func(c *cgin.Context) {
 		// 注意写前端时，请求头Authorization的格式为Bearer tokenString
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

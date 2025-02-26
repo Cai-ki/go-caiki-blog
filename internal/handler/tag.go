@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/Cai-ki/go-caiki-blog/models"
+	"github.com/Cai-ki/go-caiki-blog/pkg/cgin"
 	"github.com/Cai-ki/go-caiki-blog/utils"
-	"github.com/gin-gonic/gin"
 )
 
 type tagInfo struct {
@@ -14,7 +14,7 @@ type tagInfo struct {
 	Name string `json:"name"`
 }
 
-func ListTagsHandler(c *gin.Context) {
+func ListTagsHandler(c *cgin.Context) {
 	tags := []models.Tags{}
 	err := TagService.ListTags(&tags)
 	if err != nil {
@@ -33,11 +33,12 @@ func ListTagsHandler(c *gin.Context) {
 	utils.RespondWithJSON(c, http.StatusOK, tagInfos)
 }
 
-func ConnectTagsHandler(c *gin.Context) {
+func ConnectTagsHandler(c *cgin.Context) {
 	var req struct {
 		PostID uint     `json:"post_id"`
 		Tags   []string `json:"tags"`
 	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -67,7 +68,7 @@ func ConnectTagsHandler(c *gin.Context) {
 	utils.RespondWithError(c, http.StatusCreated, "Tags connected successfully")
 }
 
-func ListPostTagsHandler(c *gin.Context) {
+func ListPostTagsHandler(c *cgin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
